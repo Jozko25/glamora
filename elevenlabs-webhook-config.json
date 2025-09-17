@@ -1,0 +1,115 @@
+{
+  "type": "webhook",
+  "name": "glamora-booking-system",
+  "description": "Kompletný rezervačný systém pre Glamora Studio - kontrola dostupnosti a vytvorenie rezervácií",
+  "disable_interruptions": false,
+  "force_pre_tool_speech": "auto",
+  "assignments": [],
+  "api_schema": {
+    "url": "https://teamupkalendar-production.up.railway.app/api/booking",
+    "method": "POST",
+    "path_params_schema": [],
+    "query_params_schema": [],
+    "request_body_schema": {
+      "id": "body",
+      "type": "object",
+      "description": "Rezervačný systém pre Glamora Studio",
+      "properties": [
+        {
+          "id": "action",
+          "type": "string",
+          "value_type": "llm_prompt",
+          "description": "Typ akcie: 'book' pre vytvorenie rezervácie, 'check_availability' pre kontrolu dostupnosti, 'find_next_available' pre nájdenie najskoršieho termínu",
+          "dynamic_variable": "",
+          "constant_value": "",
+          "enum": ["book", "check_availability", "find_next_available"],
+          "required": true
+        },
+        {
+          "id": "customerName",
+          "type": "string",
+          "value_type": "llm_prompt",
+          "description": "Celé meno klientky (povinné len pre action: 'book')",
+          "dynamic_variable": "",
+          "constant_value": "",
+          "enum": null,
+          "required": false
+        },
+        {
+          "id": "customerPhone",
+          "type": "string",
+          "value_type": "llm_prompt",
+          "description": "Telefónne číslo klientky vo formáte +421XXXXXXXXX (povinné len pre action: 'book')",
+          "dynamic_variable": "",
+          "constant_value": "",
+          "enum": null,
+          "required": false
+        },
+        {
+          "id": "serviceName",
+          "type": "string",
+          "value_type": "llm_prompt",
+          "description": "Presný názov služby podľa ponuky: 'Strihanie, umytie, fúkanie, česanie', 'Farbenie korienkov', 'Melír', 'Balayage', 'Airtouch', 'Klasické kozmetické ošetrenie', 'Permanentný make-up obočia', atď.",
+          "dynamic_variable": "",
+          "constant_value": "",
+          "enum": null,
+          "required": true
+        },
+        {
+          "id": "preferredStaff",
+          "type": "string",
+          "value_type": "llm_prompt",
+          "description": "Preferovaný personál: 'Janka', 'Nika', 'Lívia' (kaderníčky) alebo 'Dominika' (kozmetička). Ak klientka nemá preferenciu, nevyplňuj",
+          "dynamic_variable": "",
+          "constant_value": "",
+          "enum": null,
+          "required": false
+        },
+        {
+          "id": "preferredDate",
+          "type": "string",
+          "value_type": "llm_prompt",
+          "description": "Preferovaný dátum vo formáte YYYY-MM-DD (rok 2025). Pre find_next_available nevyplňuj",
+          "dynamic_variable": "",
+          "constant_value": "",
+          "enum": null,
+          "required": false
+        },
+        {
+          "id": "preferredTime",
+          "type": "string",
+          "value_type": "llm_prompt",
+          "description": "Preferovaný čas vo formáte HH:MM (napr. 14:00). Pre find_next_available nevyplňuj",
+          "dynamic_variable": "",
+          "constant_value": "",
+          "enum": null,
+          "required": false
+        },
+        {
+          "id": "sessionId",
+          "type": "string",
+          "value_type": "llm_prompt",
+          "description": "Identifikátor relácie pre sledovanie rezervácie (automaticky vygenerovaný)",
+          "dynamic_variable": "",
+          "constant_value": "",
+          "enum": null,
+          "required": false
+        }
+      ],
+      "required": false,
+      "value_type": "llm_prompt"
+    },
+    "request_headers": [
+      {
+        "type": "value",
+        "name": "Content-Type",
+        "value": "application/json"
+      }
+    ],
+    "auth_connection": null
+  },
+  "response_timeout_secs": 30,
+  "dynamic_variables": {
+    "dynamic_variable_placeholders": {}
+  }
+}
