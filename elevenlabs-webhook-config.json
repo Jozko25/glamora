@@ -6,7 +6,7 @@
   "force_pre_tool_speech": "auto",
   "assignments": [],
   "api_schema": {
-    "url": "https://teamupkalendar-production.up.railway.app/api/booking",
+    "url": "https://glamora-production.up.railway.app/api/booking",
     "method": "POST",
     "path_params_schema": [],
     "query_params_schema": [],

@@ -347,8 +347,22 @@ export class BookingController {
       };
     }
 
-    // Try all staff members who can perform this service
-    const availableStaff = STAFF.filter(s => s.role === service.staffType);
+    // Filter staff based on preference and service type
+    let availableStaff = STAFF.filter(s => s.role === service.staffType);
+
+    // If preferred staff is specified, only search for that staff member
+    if (request.preferredStaff) {
+      const preferredStaffMember = availableStaff.find(s => s.name === request.preferredStaff);
+      if (!preferredStaffMember) {
+        return {
+          success: false,
+          message: `Staff member "${request.preferredStaff}" not found or cannot perform this service`,
+          error: 'STAFF_NOT_FOUND'
+        };
+      }
+      availableStaff = [preferredStaffMember];
+    }
+
     let earliestSlot: any = null;
 
     for (const staff of availableStaff) {
