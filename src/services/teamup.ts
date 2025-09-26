@@ -330,6 +330,21 @@ class TeamUpService {
 
         let slotStart = workStart.clone();
 
+        // For same-day bookings, skip past current time + 15 minute buffer
+        const now = moment.tz(TIMEZONE);
+        const isToday = currentDate.format('YYYY-MM-DD') === now.format('YYYY-MM-DD');
+        if (isToday) {
+          const minBookingTime = now.add(15, 'minutes');
+          if (slotStart.isBefore(minBookingTime)) {
+            slotStart = minBookingTime.clone();
+            // Round up to next 30-minute interval
+            const minutes = slotStart.minutes();
+            if (minutes % 30 !== 0) {
+              slotStart.add(30 - (minutes % 30), 'minutes');
+            }
+          }
+        }
+
         while (slotStart.clone().add(service.duration, 'minutes').isSameOrBefore(workEnd)) {
           const slotEnd = slotStart.clone().add(service.duration, 'minutes');
 
