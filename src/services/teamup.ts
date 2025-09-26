@@ -197,14 +197,20 @@ class TeamUpService {
       endDateTime.format('YYYY-MM-DD')
     );
 
+    console.log(`Checking availability for ${staffName} on ${date} at ${startTime}`);
+    console.log(`Found ${allDayEvents.length} total events on this day`);
+
     // Check if there's ANY vacation/training event that includes this staff member
     for (const event of allDayEvents) {
       if (this.isVacationEvent(event)) {
+        console.log(`Found training/vacation event: "${event.title}" with who="${event.who}", subcalendar_id=${event.subcalendar_id}, checking if it affects ${staffName} (id: ${subcalendarId})`);
         // Check if this event involves our staff member
+        // For "školenie" events, block the time for the staff member if their subcalendar is affected
         if (event.subcalendar_ids?.includes(subcalendarId) ||
             event.subcalendar_id === subcalendarId ||
             event.who?.toLowerCase().includes(staffName.toLowerCase()) ||
             event.title?.toLowerCase().includes(staffName.toLowerCase())) {
+          console.log(`Training event blocks ${staffName}'s entire day`);
           return false; // Training/vacation blocks the entire day for this staff
         }
       }
