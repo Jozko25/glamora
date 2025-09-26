@@ -203,14 +203,9 @@ class TeamUpService {
     // Check if there's ANY vacation/training event that includes this staff member
     for (const event of allDayEvents) {
       if (this.isVacationEvent(event)) {
-        console.log(`Found training/vacation event: "${event.title}" with who="${event.who}", subcalendar_id=${event.subcalendar_id}, checking if it affects ${staffName} (id: ${subcalendarId})`);
-        // Check if this event involves our staff member
-        // For "školenie" events, block the time for the staff member if their subcalendar is affected
+        // Only block if the event specifically involves this staff member's subcalendar
         if (event.subcalendar_ids?.includes(subcalendarId) ||
-            event.subcalendar_id === subcalendarId ||
-            event.who?.toLowerCase().includes(staffName.toLowerCase()) ||
-            event.title?.toLowerCase().includes(staffName.toLowerCase())) {
-          console.log(`Training event blocks ${staffName}'s entire day`);
+            event.subcalendar_id === subcalendarId) {
           return false; // Training/vacation blocks the entire day for this staff
         }
       }
@@ -269,7 +264,7 @@ class TeamUpService {
 
     const end = endDate
       ? moment.tz(endDate, TIMEZONE)
-      : start.clone().add(3, 'days'); // Further reduced search window
+      : start.clone().add(14, 'days'); // Back to original search window
 
     const currentDate = start.clone();
 

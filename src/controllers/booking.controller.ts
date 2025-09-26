@@ -378,7 +378,6 @@ export class BookingController {
   }
 
   private async handleFindNextAvailable(request: BookingRequest): Promise<BookingResponse> {
-    console.log('Finding next available for:', request.serviceName);
 
     if (!request.serviceName) {
       return {
@@ -415,62 +414,22 @@ export class BookingController {
 
     let allSlots: any[] = [];
 
-    try {
-      // Add timeout to prevent hanging
-      const searchPromise = Promise.race([
-        (async () => {
-          for (const staff of availableStaff) {
-            const slots = await teamUpService.findAvailableSlots(
-              staff.name,
-              request.serviceName,
-              undefined,
-              undefined,
-              5, // Reduced to prevent timeout
-              this.parseExcludeSlots(request.excludeSlots as any)
-            );
+    for (const staff of availableStaff) {
+      const slots = await teamUpService.findAvailableSlots(
+        staff.name,
+        request.serviceName,
+        undefined,
+        undefined,
+        10, // Get more slots
+        this.parseExcludeSlots(request.excludeSlots as any)
+      );
 
-            allSlots = allSlots.concat(slots);
+      allSlots = allSlots.concat(slots);
 
-            // If we have enough slots, stop searching to prevent timeout
-            if (allSlots.length >= 5) {
-              break;
-            }
-          }
-          return allSlots;
-        })(),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('TIMEOUT')), 15000)
-        )
-      ]);
-
-      allSlots = await searchPromise as any[];
-    } catch (error) {
-      console.log('TeamUp search timeout, providing fallback slots');
-      // Return fallback slots when TeamUp is slow
-      const tomorrow = moment().tz('Europe/Bratislava').add(1, 'day');
-      allSlots = [
-        {
-          date: tomorrow.format('YYYY-MM-DD'),
-          time: '10:00',
-          endTime: '11:00',
-          staffName: availableStaff[0].name,
-          available: true
-        },
-        {
-          date: tomorrow.format('YYYY-MM-DD'),
-          time: '14:00',
-          endTime: '15:00',
-          staffName: availableStaff[0].name,
-          available: true
-        },
-        {
-          date: tomorrow.add(1, 'day').format('YYYY-MM-DD'),
-          time: '09:00',
-          endTime: '10:00',
-          staffName: availableStaff[0].name,
-          available: true
-        }
-      ];
+      // If we have enough slots, stop searching
+      if (allSlots.length >= 10) {
+        break;
+      }
     }
 
     // Sort all slots by date and time
