@@ -419,7 +419,7 @@ export class BookingController {
         request.serviceName,
         undefined,
         undefined,
-        20, // Get more slots to have options
+        5, // Reduced to prevent timeout
         this.parseExcludeSlots(request.excludeSlots as any)
       );
 

@@ -267,7 +267,7 @@ class TeamUpService {
 
     const end = endDate
       ? moment.tz(endDate, TIMEZONE)
-      : start.clone().add(14, 'days');
+      : start.clone().add(7, 'days'); // Reduced search window
 
     const currentDate = start.clone();
 
