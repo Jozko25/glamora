@@ -8,6 +8,20 @@ import { validateAndNormalizePhone, validateFutureDateTime } from '../utils/vali
 import moment from 'moment-timezone';
 
 export class BookingController {
+  private parseExcludeSlots(excludeSlotsString?: string): Array<{ date: string; time: string; staffName?: string }> | undefined {
+    if (!excludeSlotsString) return undefined;
+
+    try {
+      // Handle both array format and string format from ElevenLabs
+      if (typeof excludeSlotsString === 'string') {
+        return JSON.parse(excludeSlotsString);
+      }
+      return excludeSlotsString as any;
+    } catch (error) {
+      console.error('Error parsing excludeSlots:', error);
+      return undefined;
+    }
+  }
   async handleBookingRequest(req: Request, res: Response) {
     try {
       const bookingRequest: BookingRequest = req.body;
@@ -350,7 +364,8 @@ export class BookingController {
       request.serviceName,
       startDate,
       endDate,
-      10
+      10,
+      this.parseExcludeSlots(request.excludeSlots as any)
     );
 
     return {
@@ -396,7 +411,7 @@ export class BookingController {
       availableStaff = [preferredStaffMember];
     }
 
-    let earliestSlot: any = null;
+    let allSlots: any[] = [];
 
     for (const staff of availableStaff) {
       const slots = await teamUpService.findAvailableSlots(
@@ -404,19 +419,21 @@ export class BookingController {
         request.serviceName,
         undefined,
         undefined,
-        1
+        20, // Get more slots to have options
+        this.parseExcludeSlots(request.excludeSlots as any)
       );
 
-      if (slots.length > 0) {
-        if (!earliestSlot || moment(`${slots[0].date} ${slots[0].time}`).isBefore(
-          moment(`${earliestSlot.date} ${earliestSlot.time}`)
-        )) {
-          earliestSlot = slots[0];
-        }
-      }
+      allSlots = allSlots.concat(slots);
     }
 
-    if (!earliestSlot) {
+    // Sort all slots by date and time
+    allSlots.sort((a, b) => {
+      const dateTimeA = moment(`${a.date} ${a.time}`);
+      const dateTimeB = moment(`${b.date} ${b.time}`);
+      return dateTimeA.isBefore(dateTimeB) ? -1 : 1;
+    });
+
+    if (allSlots.length === 0) {
       return {
         success: false,
         message: 'No available slots found in the next 2 weeks',
@@ -424,11 +441,15 @@ export class BookingController {
       };
     }
 
+    // Return up to 5 suggested slots
+    const suggestedSlots = allSlots.slice(0, 5);
+
     return {
       success: true,
-      message: `Next available slot found with ${earliestSlot.staffName}`,
+      message: `Found ${suggestedSlots.length} available slot${suggestedSlots.length > 1 ? 's' : ''}`,
       data: {
-        suggestedSlot: earliestSlot
+        suggestedSlot: suggestedSlots[0], // Keep backward compatibility
+        suggestedSlots: suggestedSlots
       }
     };
   }

@@ -223,7 +223,8 @@ class TeamUpService {
     serviceName: string,
     startDate?: string,
     endDate?: string,
-    maxSlots: number = 10
+    maxSlots: number = 10,
+    excludeSlots?: Array<{ date: string; time: string; staffName?: string }>
   ): Promise<TimeSlot[]> {
     const service = findService(serviceName);
     if (!service) {
@@ -276,13 +277,24 @@ class TeamUpService {
           );
 
           if (available) {
-            slots.push({
+            const slot = {
               date: currentDate.format('YYYY-MM-DD'),
               time: slotStart.format('HH:mm'),
               endTime: slotStart.clone().add(service.duration, 'minutes').format('HH:mm'),
               staffName,
               available: true
-            });
+            };
+
+            // Check if this slot should be excluded
+            const shouldExclude = excludeSlots?.some(excludeSlot =>
+              excludeSlot.date === slot.date &&
+              excludeSlot.time === slot.time &&
+              (!excludeSlot.staffName || excludeSlot.staffName === slot.staffName)
+            );
+
+            if (!shouldExclude) {
+              slots.push(slot);
+            }
           }
 
           slotStart.add(30, 'minutes'); // Check every 30 minutes

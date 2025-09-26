@@ -23,6 +23,11 @@ export interface BookingRequest {
   action: 'book' | 'check_availability' | 'find_next_available' | 'human_request';
   sessionId?: string;
   conversationContext?: any;
+  excludeSlots?: Array<{
+    date: string;
+    time: string;
+    staffName?: string;
+  }> | string;
 }
 
 export interface BookingResponse {
@@ -32,6 +37,7 @@ export interface BookingResponse {
     bookingId?: string;
     availableSlots?: TimeSlot[];
     suggestedSlot?: TimeSlot;
+    suggestedSlots?: TimeSlot[];
     bookedSlot?: {
       date: string;
       time: string;

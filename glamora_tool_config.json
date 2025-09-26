@@ -6,7 +6,7 @@
   "force_pre_tool_speech": "auto",
   "assignments": [],
   "api_schema": {
-    "url": "https://glamora-production.up.railway.app/api/booking",
+    "url": "http://localhost:3000/api/booking",
     "method": "POST",
     "path_params_schema": [],
     "query_params_schema": [],
@@ -80,6 +80,16 @@
           "type": "string",
           "value_type": "llm_prompt",
           "description": "Phone +421XXXXXXXXX",
+          "dynamic_variable": "",
+          "constant_value": "",
+          "enum": null,
+          "required": false
+        },
+        {
+          "id": "excludeSlots",
+          "type": "string",
+          "value_type": "llm_prompt",
+          "description": "JSON string of slots to exclude: [{\"date\":\"YYYY-MM-DD\",\"time\":\"HH:MM\",\"staffName\":\"NAME\"}]",
           "dynamic_variable": "",
           "constant_value": "",
           "enum": null,
