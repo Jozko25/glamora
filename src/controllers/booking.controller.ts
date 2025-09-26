@@ -378,6 +378,8 @@ export class BookingController {
   }
 
   private async handleFindNextAvailable(request: BookingRequest): Promise<BookingResponse> {
+    console.log('Finding next available for:', request.serviceName);
+
     if (!request.serviceName) {
       return {
         success: false,
@@ -424,6 +426,11 @@ export class BookingController {
       );
 
       allSlots = allSlots.concat(slots);
+
+      // If we have enough slots, stop searching to prevent timeout
+      if (allSlots.length >= 5) {
+        break;
+      }
     }
 
     // Sort all slots by date and time
