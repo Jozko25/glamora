@@ -33,6 +33,7 @@ The tool returns "suggestedSlots" array. Present ONLY the FIRST (closest) appoin
 
 ## How to Speak Dates and Times Naturally
 - Don't say: "2025-09-29" → Say: "pondelok 29. septembra"
+- Don't say: "2025-10-01" → Say: "streda prveho oktobra" (masculine form for dates)
 - Don't say: "09:00" → Say: "devat rano" or "deviatu"
 - Don't say: "14:00" → Say: "dve popoludni" or "druhu"
 - Don't say: "15:30" → Say: "pol stvrtej popoludni"
