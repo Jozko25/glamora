@@ -4,6 +4,7 @@ import { teamUpService } from '../services/teamup';
 import { verificationService } from '../services/verification';
 import { findService } from '../config/services';
 import { STAFF } from '../config/staff';
+import { validateAndNormalizePhone, validateFutureDateTime } from '../utils/validation';
 import moment from 'moment-timezone';
 
 export class BookingController {
@@ -143,6 +144,38 @@ export class BookingController {
       };
     }
 
+    // Validate and normalize phone number
+    const normalizedPhone = validateAndNormalizePhone(request.customerPhone);
+    if (!normalizedPhone) {
+      return {
+        success: false,
+        message: 'Invalid phone number format. Please use Slovak format (+421912345678 or 0912345678)',
+        error: 'INVALID_PHONE_FORMAT'
+      };
+    }
+
+    // Validate future date/time
+    if (!validateFutureDateTime(request.preferredDate || '', request.preferredTime)) {
+      return {
+        success: false,
+        message: 'Cannot book appointments in the past. Please select a future date and time.',
+        error: 'PAST_DATE_NOT_ALLOWED'
+      };
+    }
+
+    // Check for existing booking
+    const existingBooking = await teamUpService.checkExistingBooking(normalizedPhone);
+    if (existingBooking) {
+      const existingDate = moment(existingBooking.start_dt).format('YYYY-MM-DD');
+      const existingTime = moment(existingBooking.start_dt).format('HH:mm');
+
+      return {
+        success: false,
+        message: `You already have an appointment scheduled for ${existingDate} at ${existingTime}. Please contact us to modify or cancel your existing booking.`,
+        error: 'EXISTING_BOOKING_FOUND'
+      };
+    }
+
     // Find the service
     const service = findService(request.serviceName);
     if (!service) {
@@ -241,7 +274,7 @@ export class BookingController {
       const booking = await teamUpService.bookAppointment(
         staffName,
         request.customerName,
-        request.customerPhone,
+        normalizedPhone,
         request.serviceName,
         date,
         time

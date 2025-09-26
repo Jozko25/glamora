@@ -18,16 +18,54 @@ class TeamUpService {
   }
   private subcalendarMap: Map<string, number> = new Map();
 
+  // Vacation keywords to check (case-insensitive)
+  private readonly VACATION_KEYWORDS = [
+    'dovolenka', 'DOVOLENKA', 'Dovolenka',
+    'dovoľenka', 'DOVOĽENKA', 'Dovoľenka',
+    'vacation', 'VACATION', 'Vacation',
+    'holiday', 'HOLIDAY', 'Holiday'
+  ];
+
+  /**
+   * Check if customer already has an appointment in the near future
+   * Search by phone number in custom.kontakt field
+   */
+  async checkExistingBooking(customerPhone: string): Promise<TeamUpEvent | null> {
+    const futureDate = moment.tz(TIMEZONE).add(30, 'days').format('YYYY-MM-DD');
+    const today = moment.tz(TIMEZONE).format('YYYY-MM-DD');
+
+    try {
+      // Search all subcalendars for existing bookings
+      const events = await this.getEvents(today, futureDate);
+
+      for (const event of events) {
+        // Check if phone number matches in custom fields, notes, or who field
+        if ((event as any).custom?.kontakt?.includes(customerPhone) ||
+            event.notes?.includes(customerPhone) ||
+            event.who?.includes(customerPhone)) {
+          return event;
+        }
+      }
+    } catch (error) {
+      console.log('Error checking existing bookings:', error);
+    }
+
+    return null;
+  }
+
   constructor() {
     this.initializeSubcalendars();
   }
 
   private initializeSubcalendars() {
-    // Map staff names to subcalendar IDs from fresh calendar
-    this.subcalendarMap.set('Janka', 14809606);
-    this.subcalendarMap.set('Nika', 14809601);
-    this.subcalendarMap.set('Lívia', 14809600);
-    this.subcalendarMap.set('Dominika', 14809608);
+    // CLIENT PRODUCTION SUBCALENDAR IDs for calendar ksxtixzt14gusrox5d
+    this.subcalendarMap.set('Janka', 11754111);      // GLAMORA > Janka
+    this.subcalendarMap.set('Nika', 11754110);       // GLAMORA > Nika
+    this.subcalendarMap.set('Lívia', 12448216);      // GLAMORA > Lívia
+    this.subcalendarMap.set('Dominika', 11754238);   // GLAMORA > Dominika
+    // Additional staff members available in calendar:
+    // this.subcalendarMap.set('Katka', 11754354);   // GLAMORA > Katka
+    // this.subcalendarMap.set('Margarita', 11787096); // GLAMORA > Margarita
   }
 
   private getHeaders() {
@@ -59,15 +97,20 @@ class TeamUpService {
   }
 
   async createEvent(event: TeamUpEvent): Promise<TeamUpEvent> {
-    const response = await axios.post(
-      `${TEAMUP_BASE_URL}/${this.calendarKey}/events`,
-      event,
-      {
-        headers: this.getHeaders()
-      }
-    );
+    try {
+      const response = await axios.post(
+        `${TEAMUP_BASE_URL}/${this.calendarKey}/events`,
+        event,
+        {
+          headers: this.getHeaders()
+        }
+      );
 
-    return response.data.event;
+      return response.data.event;
+    } catch (error: any) {
+      console.error('Event creation failed:', error.response?.data || error.message);
+      throw error;
+    }
   }
 
   async updateEvent(eventId: string, event: Partial<TeamUpEvent>): Promise<TeamUpEvent> {
@@ -89,6 +132,29 @@ class TeamUpService {
         headers: this.getHeaders()
       }
     );
+  }
+
+  private isVacationEvent(event: TeamUpEvent): boolean {
+    // Check all relevant fields for vacation keywords
+    const fieldsToCheck = [
+      event.who || '',
+      event.title || '',
+      event.notes || ''
+    ];
+
+    for (const field of fieldsToCheck) {
+      // Convert to lowercase for case-insensitive comparison
+      const fieldLower = field.toLowerCase();
+
+      // Check if any vacation keyword is present
+      for (const keyword of this.VACATION_KEYWORDS) {
+        if (fieldLower.includes(keyword.toLowerCase())) {
+          return true;
+        }
+      }
+    }
+
+    return false;
   }
 
   async checkAvailability(
@@ -127,6 +193,14 @@ class TeamUpService {
       [subcalendarId]
     );
 
+    // First check if there's ANY vacation event on this day (blocks entire day)
+    for (const event of events) {
+      if (this.isVacationEvent(event)) {
+        return false; // Vacation blocks the entire day
+      }
+    }
+
+    // Then check for normal appointment conflicts
     for (const event of events) {
       const eventStart = moment.tz(event.start_dt, TIMEZONE);
       const eventEnd = moment.tz(event.end_dt, TIMEZONE);
@@ -157,9 +231,18 @@ class TeamUpService {
     }
 
     const slots: TimeSlot[] = [];
-    const start = startDate
+    const now = moment.tz(TIMEZONE);
+
+    // Ensure start date is not in the past
+    let start = startDate
       ? moment.tz(startDate, TIMEZONE)
       : moment.tz(TIMEZONE).add(1, 'day');
+
+    // If requested start date is in the past, start from tomorrow
+    if (start.isBefore(now, 'day')) {
+      start = now.clone().add(1, 'day').startOf('day');
+    }
+
     const end = endDate
       ? moment.tz(endDate, TIMEZONE)
       : start.clone().add(14, 'days');
@@ -235,6 +318,7 @@ class TeamUpService {
 
     // Check availability first
     const isAvailable = await this.checkAvailability(staffName, date, time, service.duration);
+
     if (!isAvailable) {
       throw new Error('Time slot is not available');
     }
@@ -247,10 +331,11 @@ class TeamUpService {
       who: customerName,
       notes: `Telefón: ${customerPhone}\nSlužba: ${serviceName}\nTrvanie: ${service.duration} min`,
       custom: {
+        kontakt: customerPhone,  // Required field for this calendar
         customerPhone,
         service: serviceName,
         confirmed: false
-      }
+      } as any
     };
 
     return await this.createEvent(event);
