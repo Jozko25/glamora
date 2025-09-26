@@ -49,6 +49,11 @@ export interface BookingResponse {
     slot?: TimeSlot;
     confirmationRequired?: boolean;
     sessionId?: string;
+    currentDate?: {
+      date: string;
+      dayName: string;
+      time: string;
+    };
   };
   error?: string;
   requiresHuman?: boolean;

@@ -7,7 +7,24 @@ import { STAFF } from '../config/staff';
 import { validateAndNormalizePhone, validateFutureDateTime } from '../utils/validation';
 import moment from 'moment-timezone';
 
+const TIMEZONE = 'Europe/Bratislava';
+
 export class BookingController {
+  private getCurrentDateContext() {
+    const now = moment.tz(TIMEZONE);
+    const dayNames = ['nedela', 'pondelok', 'utorok', 'streda', 'stvrtok', 'piatok', 'sobota'];
+    const monthNames = [
+      'januar', 'februar', 'marec', 'april', 'maj', 'jun',
+      'jul', 'august', 'september', 'oktober', 'november', 'december'
+    ];
+
+    return {
+      date: now.format('YYYY-MM-DD'),
+      dayName: `${dayNames[now.day()]} ${now.date()}. ${monthNames[now.month()]} ${now.year()}`,
+      time: now.format('HH:mm')
+    };
+  }
+
   private parseExcludeSlots(excludeSlotsString?: string): Array<{ date: string; time: string; staffName?: string }> | undefined {
     if (!excludeSlotsString) return undefined;
 
@@ -379,14 +396,18 @@ export class BookingController {
                 .format('HH:mm'),
               staffName,
               available: true
-            }
+            },
+            currentDate: this.getCurrentDateContext()
           }
         };
       } else {
         return {
           success: false,
           message: 'Requested slot is not available',
-          error: 'SLOT_NOT_AVAILABLE'
+          error: 'SLOT_NOT_AVAILABLE',
+          data: {
+            currentDate: this.getCurrentDateContext()
+          }
         };
       }
     }
@@ -479,7 +500,10 @@ export class BookingController {
       return {
         success: false,
         message: 'No available slots found in the next 2 weeks',
-        error: 'NO_AVAILABILITY'
+        error: 'NO_AVAILABILITY',
+        data: {
+          currentDate: this.getCurrentDateContext()
+        }
       };
     }
 
@@ -491,7 +515,8 @@ export class BookingController {
       message: `Found ${suggestedSlots.length} available slot${suggestedSlots.length > 1 ? 's' : ''}`,
       data: {
         suggestedSlot: suggestedSlots[0], // Keep backward compatibility
-        suggestedSlots: suggestedSlots
+        suggestedSlots: suggestedSlots,
+        currentDate: this.getCurrentDateContext()
       }
     };
   }
