@@ -139,6 +139,7 @@ class TeamUpService {
 
   private isVacationEvent(event: TeamUpEvent): boolean {
     // Check all relevant fields for vacation keywords
+    // This blocks entire day for training, vacations, workshops etc.
     const fieldsToCheck = [
       event.who || '',
       event.title || '',
