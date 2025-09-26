@@ -249,6 +249,11 @@ class TeamUpService {
       throw new Error(`Service ${serviceName} not found`);
     }
 
+    const subcalendarId = this.subcalendarMap.get(staffName);
+    if (!subcalendarId) {
+      throw new Error(`Staff member ${staffName} not found`);
+    }
+
     const slots: TimeSlot[] = [];
     const now = moment.tz(TIMEZONE);
 
@@ -264,41 +269,87 @@ class TeamUpService {
 
     const end = endDate
       ? moment.tz(endDate, TIMEZONE)
-      : start.clone().add(14, 'days'); // Back to original search window
+      : start.clone().add(14, 'days');
+
+    // Fetch ALL events for the entire date range at once
+    const allEvents = await this.getEvents(
+      start.format('YYYY-MM-DD'),
+      end.format('YYYY-MM-DD')
+    );
+
+    // Fetch staff-specific events
+    const staffEvents = await this.getEvents(
+      start.format('YYYY-MM-DD'),
+      end.format('YYYY-MM-DD'),
+      [subcalendarId]
+    );
+
+    // Check for vacation/training events that block this staff member
+    const vacationDays = new Set<string>();
+    for (const event of allEvents) {
+      if (this.isVacationEvent(event)) {
+        if (event.subcalendar_ids?.includes(subcalendarId) ||
+            event.subcalendar_id === subcalendarId) {
+          const eventDate = moment.tz(event.start_dt, TIMEZONE).format('YYYY-MM-DD');
+          vacationDays.add(eventDate);
+        }
+      }
+    }
 
     const currentDate = start.clone();
 
     while (currentDate.isSameOrBefore(end) && slots.length < maxSlots) {
+      const dateStr = currentDate.format('YYYY-MM-DD');
+
+      // Skip vacation days
+      if (vacationDays.has(dateStr)) {
+        currentDate.add(1, 'day');
+        continue;
+      }
+
       const dayOfWeek = currentDate.format('dddd').toLowerCase();
       const workingHours = getStaffWorkingHours(staffName, dayOfWeek);
 
       if (workingHours) {
         const workStart = moment.tz(
-          `${currentDate.format('YYYY-MM-DD')} ${workingHours.start}`,
+          `${dateStr} ${workingHours.start}`,
           'YYYY-MM-DD HH:mm',
           TIMEZONE
         );
         const workEnd = moment.tz(
-          `${currentDate.format('YYYY-MM-DD')} ${workingHours.end}`,
+          `${dateStr} ${workingHours.end}`,
           'YYYY-MM-DD HH:mm',
           TIMEZONE
         );
 
+        // Get events for this specific day
+        const dayEvents = staffEvents.filter(event => {
+          const eventStart = moment.tz(event.start_dt, TIMEZONE);
+          return eventStart.format('YYYY-MM-DD') === dateStr;
+        });
+
         let slotStart = workStart.clone();
 
         while (slotStart.clone().add(service.duration, 'minutes').isSameOrBefore(workEnd)) {
-          const available = await this.checkAvailability(
-            staffName,
-            currentDate.format('YYYY-MM-DD'),
-            slotStart.format('HH:mm'),
-            service.duration
-          );
+          const slotEnd = slotStart.clone().add(service.duration, 'minutes');
 
-          if (available) {
+          // Check if this slot conflicts with any existing appointments
+          const hasConflict = dayEvents.some(event => {
+            const eventStart = moment.tz(event.start_dt, TIMEZONE);
+            const eventEnd = moment.tz(event.end_dt, TIMEZONE);
+
+            return (
+              (slotStart.isSameOrAfter(eventStart) && slotStart.isBefore(eventEnd)) ||
+              (slotEnd.isAfter(eventStart) && slotEnd.isSameOrBefore(eventEnd)) ||
+              (slotStart.isSameOrBefore(eventStart) && slotEnd.isSameOrAfter(eventEnd))
+            );
+          });
+
+          if (!hasConflict) {
             const slot = {
-              date: currentDate.format('YYYY-MM-DD'),
+              date: dateStr,
               time: slotStart.format('HH:mm'),
-              endTime: slotStart.clone().add(service.duration, 'minutes').format('HH:mm'),
+              endTime: slotEnd.format('HH:mm'),
               staffName,
               available: true
             };
