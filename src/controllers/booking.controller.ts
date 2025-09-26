@@ -418,8 +418,8 @@ export class BookingController {
       const slots = await teamUpService.findAvailableSlots(
         staff.name,
         request.serviceName,
-        undefined,
-        undefined,
+        request.preferredDate, // Use preferred date if provided
+        request.preferredDate ? request.preferredDate : undefined, // End date same as start if specific date requested
         10, // Get more slots
         this.parseExcludeSlots(request.excludeSlots as any)
       );

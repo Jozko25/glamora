@@ -19,7 +19,7 @@
           "id": "action",
           "type": "string",
           "value_type": "llm_prompt",
-          "description": "Action: find_next_available, check_availability, book",
+          "description": "Action to perform: find_next_available, check_availability, book",
           "dynamic_variable": "",
           "constant_value": "",
           "enum": null,
