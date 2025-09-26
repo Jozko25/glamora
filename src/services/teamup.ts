@@ -191,21 +191,34 @@ class TeamUpService {
     }
 
     // Check for conflicts with existing appointments
-    const events = await this.getEvents(
+    // First, get ALL events for the day to check for training/vacation events
+    const allDayEvents = await this.getEvents(
+      startDateTime.format('YYYY-MM-DD'),
+      endDateTime.format('YYYY-MM-DD')
+    );
+
+    // Check if there's ANY vacation/training event that includes this staff member
+    for (const event of allDayEvents) {
+      if (this.isVacationEvent(event)) {
+        // Check if this event involves our staff member
+        if (event.subcalendar_ids?.includes(subcalendarId) ||
+            event.subcalendar_id === subcalendarId ||
+            event.who?.toLowerCase().includes(staffName.toLowerCase()) ||
+            event.title?.toLowerCase().includes(staffName.toLowerCase())) {
+          return false; // Training/vacation blocks the entire day for this staff
+        }
+      }
+    }
+
+    // Now get events specific to this staff member's subcalendar for regular appointments
+    const staffEvents = await this.getEvents(
       startDateTime.format('YYYY-MM-DD'),
       endDateTime.format('YYYY-MM-DD'),
       [subcalendarId]
     );
 
-    // First check if there's ANY vacation event on this day (blocks entire day)
-    for (const event of events) {
-      if (this.isVacationEvent(event)) {
-        return false; // Vacation blocks the entire day
-      }
-    }
-
     // Then check for normal appointment conflicts
-    for (const event of events) {
+    for (const event of staffEvents) {
       const eventStart = moment.tz(event.start_dt, TIMEZONE);
       const eventEnd = moment.tz(event.end_dt, TIMEZONE);
 
