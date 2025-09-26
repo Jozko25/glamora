@@ -9,19 +9,19 @@ export const SERVICES: Service[] = [
     staffType: 'hairdresser'
   },
   {
-    name: 'Strihanie, umytie, fúkanie, česanie',
+    name: 'Strihanie, umytie, fukanie, cesanie',
     duration: 60,
     category: 'hair',
     staffType: 'hairdresser'
   },
   {
-    name: 'Zložitejší účes',
+    name: 'Zlozitejsi uces',
     duration: 90,
     category: 'hair',
     staffType: 'hairdresser'
   },
   {
-    name: 'Svadobný účes',
+    name: 'Svadobny uces',
     duration: 120,
     category: 'hair',
     staffType: 'hairdresser'
@@ -33,13 +33,13 @@ export const SERVICES: Service[] = [
     staffType: 'hairdresser'
   },
   {
-    name: 'Melír extra dlhé vlasy',
+    name: 'Melir extra dlhe vlasy',
     duration: 240,
     category: 'hair',
     staffType: 'hairdresser'
   },
   {
-    name: 'Mikro melír',
+    name: 'Mikro melir',
     duration: 300, // average of 4-6 hours
     category: 'hair',
     staffType: 'hairdresser'
@@ -57,37 +57,37 @@ export const SERVICES: Service[] = [
     staffType: 'hairdresser'
   },
   {
-    name: 'Balayage dlhé vlasy',
+    name: 'Balayage dlhe vlasy',
     duration: 240,
     category: 'hair',
     staffType: 'hairdresser'
   },
   {
-    name: 'Úplné odfarbenie',
+    name: 'Uplne odfarbenie',
     duration: 360,
     category: 'hair',
     staffType: 'hairdresser'
   },
   {
-    name: 'Vyrovnávacia vlasová kúra',
+    name: 'Vyrovnavacia vlasova kura',
     duration: 420, // average of 6-8 hours
     category: 'hair',
     staffType: 'hairdresser'
   },
   {
-    name: 'Predlžovanie vlasov - odpájanie',
+    name: 'Predlzovanie vlasov - odpajanie',
     duration: 150,
     category: 'hair',
     staffType: 'hairdresser'
   },
   {
-    name: 'Predlžovanie vlasov - napájanie',
+    name: 'Predlzovanie vlasov - napajanie',
     duration: 210, // average of 3-4 hours
     category: 'hair',
     staffType: 'hairdresser'
   },
   {
-    name: 'Strih + kúra',
+    name: 'Strih + kura',
     duration: 90,
     category: 'hair',
     staffType: 'hairdresser'
@@ -95,85 +95,85 @@ export const SERVICES: Service[] = [
 
   // Cosmetic Services
   {
-    name: 'Klasické kozmetické ošetrenie',
+    name: 'Klasicke kozmeticke osetrenie',
     duration: 75,
     category: 'cosmetics',
     staffType: 'cosmetician'
   },
   {
-    name: 'Farbenie, úprava a ošetrenie obočia',
+    name: 'Farbenie, uprava a osetrenie oboci',
     duration: 90,
     category: 'cosmetics',
     staffType: 'cosmetician'
   },
   {
-    name: 'Samostatné farbenie a úprava obočia',
+    name: 'Samostatne farbenie a uprava oboci',
     duration: 30,
     category: 'cosmetics',
     staffType: 'cosmetician'
   },
   {
-    name: 'Úprava a farbenie mihalníc',
+    name: 'Uprava a farbenie mihalnic',
     duration: 30,
     category: 'cosmetics',
     staffType: 'cosmetician'
   },
   {
-    name: 'Farbenie a úprava mihalníc + obočia',
+    name: 'Farbenie a uprava mihalnic + oboci',
     duration: 60,
     category: 'cosmetics',
     staffType: 'cosmetician'
   },
   {
-    name: 'Laminácia obočia s farbením',
+    name: 'Laminacia oboci s farbenim',
     duration: 45,
     category: 'cosmetics',
     staffType: 'cosmetician'
   },
   {
-    name: 'Laminácia obočia + lash lift',
+    name: 'Laminacia oboci + lash lift',
     duration: 75,
     category: 'cosmetics',
     staffType: 'cosmetician'
   },
   {
-    name: 'Samostatný lash lift',
+    name: 'Samostatny lash lift',
     duration: 45,
     category: 'cosmetics',
     staffType: 'cosmetician'
   },
   {
-    name: 'Permanentný make-up obočia',
+    name: 'Permanentny make-up oboci',
     duration: 180,
     category: 'cosmetics',
     staffType: 'cosmetician'
   },
   {
-    name: 'Permanentný make-up pier',
+    name: 'Permanentny make-up pier',
     duration: 240,
     category: 'cosmetics',
     staffType: 'cosmetician'
   },
   {
-    name: 'Permanentný make-up očných liniek',
+    name: 'Permanentny make-up ocnych liniek',
     duration: 180,
     category: 'cosmetics',
     staffType: 'cosmetician'
   },
   {
-    name: 'Líčenie štandard',
+    name: 'Licenie standard',
     duration: 60,
     category: 'cosmetics',
     staffType: 'cosmetician'
   },
   {
-    name: 'Náročné líčenie',
+    name: 'Narocne licenie',
     duration: 90,
     category: 'cosmetics',
     staffType: 'cosmetician'
   },
   {
-    name: 'Svadobné líčenie',
+    name: 'Svadobne licenie',
     duration: 90,
     category: 'cosmetics',
     staffType: 'cosmetician'

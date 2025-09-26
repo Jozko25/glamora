@@ -64,8 +64,10 @@ class TeamUpService {
     // CLIENT PRODUCTION SUBCALENDAR IDs for calendar ksxtixzt14gusrox5d
     this.subcalendarMap.set('Janka', 11754111);      // GLAMORA > Janka
     this.subcalendarMap.set('Nika', 11754110);       // GLAMORA > Nika
-    this.subcalendarMap.set('Lívia', 12448216);      // GLAMORA > Lívia
+    this.subcalendarMap.set('Livia', 12448216);      // GLAMORA > Livia
     this.subcalendarMap.set('Dominika', 11754238);   // GLAMORA > Dominika
+    // Support both versions for backward compatibility
+    this.subcalendarMap.set('Lívia', 12448216);      // GLAMORA > Lívia (legacy)
     // Additional staff members available in calendar:
     // this.subcalendarMap.set('Katka', 11754354);   // GLAMORA > Katka
     // this.subcalendarMap.set('Margarita', 11787096); // GLAMORA > Margarita

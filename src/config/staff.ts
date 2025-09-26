@@ -24,7 +24,7 @@ export const STAFF: Staff[] = [
     }
   },
   {
-    name: 'Lívia',
+    name: 'Livia',
     role: 'hairdresser',
     schedule: {
       monday: [2],     // afternoon
@@ -53,6 +53,10 @@ export const SHIFT_TIMES = {
 };
 
 export const SPECIAL_SHIFTS: { [key: string]: { [day: string]: { start: string; end: string } } } = {
+  'Livia': {
+    tuesday: { start: '10:00', end: '18:00' }
+  },
+  // Support legacy name for backward compatibility
   'Lívia': {
     tuesday: { start: '10:00', end: '18:00' }
   }
