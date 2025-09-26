@@ -197,8 +197,6 @@ class TeamUpService {
       endDateTime.format('YYYY-MM-DD')
     );
 
-    console.log(`Checking availability for ${staffName} on ${date} at ${startTime}`);
-    console.log(`Found ${allDayEvents.length} total events on this day`);
 
     // Check if there's ANY vacation/training event that includes this staff member
     for (const event of allDayEvents) {
