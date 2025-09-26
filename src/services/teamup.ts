@@ -18,12 +18,15 @@ class TeamUpService {
   }
   private subcalendarMap: Map<string, number> = new Map();
 
-  // Vacation keywords to check (case-insensitive)
+  // Vacation and blocking keywords to check (case-insensitive)
   private readonly VACATION_KEYWORDS = [
     'dovolenka', 'DOVOLENKA', 'Dovolenka',
     'dovoľenka', 'DOVOĽENKA', 'Dovoľenka',
     'vacation', 'VACATION', 'Vacation',
-    'holiday', 'HOLIDAY', 'Holiday'
+    'holiday', 'HOLIDAY', 'Holiday',
+    'školenie', 'ŠKOLENIE', 'Školenie',
+    'training', 'TRAINING', 'Training',
+    'workshop', 'WORKSHOP', 'Workshop'
   ];
 
   /**
