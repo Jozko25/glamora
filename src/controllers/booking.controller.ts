@@ -356,6 +356,42 @@ export class BookingController {
       staffName = availableStaff[0].name;
     }
 
+    // If specific date/time provided, check that exact slot
+    if (request.preferredDate && request.preferredTime) {
+      const isAvailable = await teamUpService.checkAvailability(
+        staffName,
+        request.preferredDate,
+        request.preferredTime,
+        service.duration
+      );
+
+      if (isAvailable) {
+        return {
+          success: true,
+          message: 'Slot is available',
+          data: {
+            available: true,
+            slot: {
+              date: request.preferredDate,
+              time: request.preferredTime,
+              endTime: moment(`${request.preferredDate} ${request.preferredTime}`, 'YYYY-MM-DD HH:mm')
+                .add(service.duration, 'minutes')
+                .format('HH:mm'),
+              staffName,
+              available: true
+            }
+          }
+        };
+      } else {
+        return {
+          success: false,
+          message: 'Requested slot is not available',
+          error: 'SLOT_NOT_AVAILABLE'
+        };
+      }
+    }
+
+    // Fallback: return available slots in the coming week
     const startDate = request.preferredDate || moment().tz('Europe/Bratislava').format('YYYY-MM-DD');
     const endDate = moment(startDate).add(7, 'days').format('YYYY-MM-DD');
 

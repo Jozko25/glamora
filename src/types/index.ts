@@ -45,6 +45,8 @@ export interface BookingResponse {
       staffName: string;
       service: string;
     };
+    available?: boolean;
+    slot?: TimeSlot;
     confirmationRequired?: boolean;
     sessionId?: string;
   };
