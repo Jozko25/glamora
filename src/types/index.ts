@@ -63,6 +63,7 @@ export interface TimeSlot {
 export interface TeamUpEvent {
   id?: string;
   subcalendar_id?: number;
+  subcalendar_ids?: number[];
   start_dt: string;
   end_dt: string;
   title: string;
