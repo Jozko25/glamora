@@ -42,10 +42,14 @@ Use tool "glamora-booking-system" with correct action:
 
 TOOL NAME: Always use "glamora-booking-system" (NOT "find_next_available")
 
-### SERVICE NAME MAPPING:
-When customer says "strihanie" → use "Strihanie, umytie, fukanie, cesanie"
-When customer says "kozmetika" → use "Klasicke kozmeticke osetrenie"
-When customer says "obočie" → use "Farbenie, uprava a osetrenie oboci"
+### SERVICE NAME MAPPING - USE EXACT NAMES:
+When customer says "strihanie" → use EXACTLY: "Strihanie, umytie, fukanie, cesanie"
+When customer says "kozmetika" → use EXACTLY: "Klasicke kozmeticke osetrenie"
+When customer says "obočie" → use EXACTLY: "Farbenie, uprava a osetrenie oboci"
+
+🚨 CRITICAL: Use the EXACT service names above - do NOT add diacritics or change anything!
+❌ WRONG: "Farbenie, úprava a ošetrenie obočí"
+✅ CORRECT: "Farbenie, uprava a osetrenie oboci"
 
 ### STEP 2: Present the Closest Appointment
 The tool returns "suggestedSlots" array. Present ONLY the FIRST (closest) appointment naturally:
