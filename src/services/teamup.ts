@@ -22,6 +22,7 @@ class TeamUpService {
   private readonly VACATION_KEYWORDS = [
     'dovolenka', 'DOVOLENKA', 'Dovolenka',
     'dovoľenka', 'DOVOĽENKA', 'Dovoľenka',
+    'nerobím', 'NEROBÍM', 'Nerobím', 'nerobim', 'NEROBIM', 'Nerobim',
     'vacation', 'VACATION', 'Vacation',
     'holiday', 'HOLIDAY', 'Holiday',
     'školenie', 'ŠKOLENIE', 'Školenie',
