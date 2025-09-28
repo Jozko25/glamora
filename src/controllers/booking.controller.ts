@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { BookingRequest, BookingResponse } from '../types';
 import { teamUpService } from '../services/teamup';
+import { twilioService } from '../services/twilio';
 import { verificationService } from '../services/verification';
 import { findService } from '../config/services';
 import { STAFF } from '../config/staff';
@@ -530,19 +531,28 @@ export class BookingController {
       };
     }
 
-    // In a real implementation, this would trigger a notification to staff
-    // For now, just log the request and return success
-    console.log('Human assistance requested:', {
-      customer: request.customerName,
-      phone: request.customerPhone,
-      service: request.serviceName,
-      preferredStaff: request.preferredStaff,
-      preferredDate: request.preferredDate
-    });
+    // Send SMS notification to staff using Twilio
+    const smsSent = await twilioService.sendHumanRequestNotification(
+      request.customerName,
+      request.customerPhone,
+      request.serviceName,
+      request.preferredStaff
+    );
+
+    if (smsSent) {
+      console.log('SMS notification sent for human assistance request:', {
+        customer: request.customerName,
+        phone: request.customerPhone,
+        service: request.serviceName,
+        preferredStaff: request.preferredStaff
+      });
+    } else {
+      console.error('Failed to send SMS notification for human assistance');
+    }
 
     return {
       success: true,
-      message: 'Our staff will assist you shortly. Please hold on.',
+      message: 'Ďakujeme, náš personál Vám zavolá späť čo najskôr.',
       requiresHuman: true
     };
   }
