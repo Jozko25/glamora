@@ -19,21 +19,21 @@
           "id": "action",
           "type": "string",
           "value_type": "llm_prompt",
-          "description": "Action to perform: find_next_available, check_availability, book",
+          "description": "Action to perform: find_next_available, check_availability, book, human_request",
           "dynamic_variable": "",
           "constant_value": "",
-          "enum": null,
+          "enum": ["find_next_available", "check_availability", "book", "human_request"],
           "required": true
         },
         {
           "id": "serviceName",
           "type": "string",
           "value_type": "llm_prompt",
-          "description": "Service name",
+          "description": "Service name (required except for human_request)",
           "dynamic_variable": "",
           "constant_value": "",
           "enum": null,
-          "required": true
+          "required": false
         },
         {
           "id": "preferredStaff",
