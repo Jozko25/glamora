@@ -80,8 +80,8 @@ Request body:
 
 ```bash
 # TeamUp Calendar API
-TEAMUP_API_KEY=1ee8ab724a01af1b4e27cd5957a292e9d252afe3f8d755ff1cc08e3c6a0ae644
-TEAMUP_CALENDAR_KEY=ksgwbfebbkgfiayjm3
+TEAMUP_API_KEY=your_teamup_api_key_here
+TEAMUP_CALENDAR_KEY=your_calendar_key_here
 
 # Server Configuration
 PORT=3000
